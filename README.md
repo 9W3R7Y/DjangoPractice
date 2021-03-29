@@ -1,6 +1,4 @@
-# DjangoPractice
-Djangoの練習
-# Django - メモ
+# Djangoなんもわからん
 
 なんもわからんので真面目に勉強する
 
@@ -39,7 +37,7 @@ Djangoの練習
 
 ## 初歩的なViewとURLconf
 
-### Viewの仕事
+### Viewとは
 
 リクエストを受け取って処理し．レスポンスを返す．各ページの機能．
 
@@ -56,7 +54,7 @@ Djangoの練習
  関数を定義し，HttpResponceを返す．（クラスのメソッドとすることもできる）
 
 ``` python
-from django.http import HttpResponse
+#from django.http import HttpResponse
 
 
 def index(request):
@@ -65,7 +63,7 @@ def index(request):
 
 
 
-### URLディスパッチャの仕事
+### URLディスパッチャとは
 
 URLconfをもとに，リクエストされたURLと対応するViewを呼びだす
 
@@ -88,9 +86,8 @@ URLconfをもとに，リクエストされたURLと対応するViewを呼びだ
 ### **アプリのURLconfの書き方**
 
 ```python
-from django.urls import path
-
-from . import views
+#from django.urls import path
+# from . import views
 
 app_name = 'hoge'
 urlpatterns = [
@@ -105,8 +102,8 @@ urlpatterns = [
 アプリのURLconfを認識させる．基本的に`include()`を使う．
 
 ```python
-from django.contrib import admin
-from django.urls import include, path
+# from django.contrib import admin
+# from django.urls import include, path
 
 urlpatterns = [
     path('hoge/', include('hoge.urls')),
@@ -159,7 +156,7 @@ def PathConverterExample(request, num):
 
 ## テンプレートの利用とRender()
 
-### テンプレート
+### テンプレートとは
 
 コンテキスト（変数名と値がペアとなった辞書）を参照し，単純なロジックを実行することのできるHTMLコンテンツ．
 
@@ -210,7 +207,7 @@ ROOT:.
  View関数内で作成されたコンテキストをテンプレートに渡し，HttpResponceを返す．例えば以下のViewを用意し，
 
 ```python
-from django.shortcuts import render
+# from django.shortcuts import render
 
 def RenderTemplateExample(request):
     context = {'text': "Hello, world."}
@@ -226,6 +223,68 @@ def RenderTemplateExample(request):
 この状態で`RenderTemplateExample`が呼び出されると，"Hello, world"という値をもつ変数`text`を持つ`context`がテンプレートである`hoge/huga.html`に受け渡される．テンプレートは`{{text}}`を参照しそれを表示する．
 
 
+
+## フォームの作成とリダイレクト
+
+### フォームとは
+
+ユーザーの入力をPOSTできる．
+
+
+
+###  フォームの作成
+
+1. フォームの機能を持つテンプレートを作成．`method`をpostaにする．submitされるとactionで指定したURLに飛ぶ．`{% csrf_token %}`をつけないとエラーになる．
+
+   ```html
+   Form
+   <form method="post" action="{% url 'hoge:submit' %}">
+       {% csrf_token %}
+       <p><input type="text" name="form_value" size="30"></p>
+       <p><input type="submit" value="submit"></p>
+   </form>
+   ```
+   
+2. フォームのテンプレートを呼び出すViewを作成
+
+   ```python
+   def FormExample(request):
+       return render(request, 'hoge/form.html)
+   ```
+
+3. submitの遷移先のViewを作成．`request.POST['<変数名>']`テンプレートと変数名を合わせる必要がある．`@csrf_protect`をつけないとエラーになる．POSTの時は`HttpResponseRedirect()`を使う．`reverse()`を使ってリダイレクト先を決める．`args`の値はパスコンバータの値に受け渡される．
+
+   ```python
+   # from django.http import HttpResponseRedirect
+   # from django.views.decorators.csrf import csrf_protect
+   # from django.urls import reverse
+   
+   @csrf_protect
+   def SubmitExample(request):
+       form_value = request.POST['form_value']
+       return HttpResponseRedirect(reverse('hoge:submitted', kwargs={'form_value': form_value}))
+   ```
+   
+4. リダイレクト先のviewを作成．上の`kwargs`の値はパスコンバータの値として受け渡されるの．
+
+   ```python
+   def SubmittedExample(request, form_value):
+       return HttpResponse(form_value)
+   ```
+
+5. アプリのURLconfを設定．リダイレクト先のURLにはパスコンバータを用意する
+
+   ```python
+   app_name = "hoge"
+   urlpatterns = [
+       # ...
+       path('form', views.FormExample, name='from'),
+       path('submit', views.SubmitExample, name='submit'),
+       path('submitted/<str:form_value>', views.SubmittedExample, name='submitted'),
+   ]
+   ```
+
+   
 
 ## アプリのインストール
 
@@ -247,13 +306,13 @@ INSTALLED_APPS = [
 
 ## Databaseとモデルの作成
 
-### Database 
+### Database とは
 
-デフォルトでSQLiteを使用できる．
+字のごとく．デフォルトでSQLiteを使用できる．
 
 
 
-### モデル
+### モデルとは
 
 データベースのレイアウトやメタデータ．どのようなデータをDatabeseに格納するのかを明示．
 
@@ -274,7 +333,7 @@ TIME_ZONE = 'Asia/Tokyo'
  `app/models.py`を作成しモデルの設定を行う．各モデルはmodels.Modelを継承したクラスとなる．データベースフィールドは`hoge=models.hugaField(options)`という構文で追加できる．
 
 ```python
-from django.db import models
+# from django.db import models
 
 class modelA(models.Model):
     text = models.CharField(max_length=100)
@@ -336,7 +395,7 @@ class modelA(models.Model):
 
 
 
-### データベースの扱い
+### データベースの操作
 
 [モデル (Model) - データアクセスの基礎](https://python.keicode.com/django/model-data-access-basics.php)
 
@@ -347,8 +406,8 @@ class modelA(models.Model):
  `hoge/admin.py`で`admin.site.register(model)`と記述すると，管理者アカウントのトップページにモデルが表示されるようになる．
 
 ```python
-from django.contrib import admin
-from .models import modelA
+# from django.contrib import admin
+# from .models import modelA
 
 admin.site.register(modelA)
 ```

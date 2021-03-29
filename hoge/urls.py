@@ -5,6 +5,8 @@ from . import views
 app_name = "hoge"
 urlpatterns = [
     path('', views.index, name='index'),
-    path('RenderTemplate', views.RenderTemplateExample, name='RenderTemplate'),
-    path('<int:num>', views.PathConverterExample, name='PathConverter'),
+    path('render_template', views.RenderTemplateExample, name='render_template'),
+    path('<int:num>', views.PathConverterExample, name='path_converter'),
+    path('form', views.FormExample, name='from'),
+    path('submit', views.SubmitExample, name='submit')
 ]

@@ -1,5 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+
+
+def index(request):
+    return HttpResponse("Index")
 
 
 def RenderTemplateExample(request):
@@ -7,9 +11,15 @@ def RenderTemplateExample(request):
     return render(request, 'hoge/huga.html', context)
 
 
-def index(request):
-    return HttpResponse("Index")
-
-
 def PathConverterExample(request, num):
     return HttpResponse(num)
+
+
+def FormExample(request):
+    return render(request, 'hoge/form.html')
+
+
+def SubmitExample(request):
+    form_value = request.POST['form_value']
+    HttpResponseRedirect(form_value)
+
